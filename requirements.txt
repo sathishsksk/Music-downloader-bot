@@ -5,3 +5,4 @@ python-telegram-bot
 requests
 updates
 ffprobe
+youtube_dl==2019.7.30

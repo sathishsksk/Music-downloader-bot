@@ -1,4 +1,4 @@
-FROM python:3.11.0 
+FROM sathishsk/music
 
 RUN apt-get -y update 
 RUN apt-get install -y ffmpeg 
@@ -6,8 +6,9 @@ RUN apt-get install -y ffmpeg
 WORKDIR /app
 
 copy requirements.txt req.txt
-RUN pip3 install --no-cache-dir -r req.txt 
 
 COPY . .
+
+EXPOSE <8080>
 
 CMD ["python3", "bot.py"]

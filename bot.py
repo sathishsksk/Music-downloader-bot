@@ -9,7 +9,8 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, Callb
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 dest = "telegramMusic/"
-TOKEN = '5862929153:AAGLEMTNGuOslFHfwzl1ncsCvhHTvRhcYCs'
+TOKEN = os.getenv("BOT_TOKEN")
+APP_NAME = os.getenv("APP_NAME")
 
 app = Flask(__name__)
 
@@ -97,8 +98,12 @@ def main():
 
     logger.info("Loaded all handlers")
 
-    updater.start_polling()
-    updater.idle()
+    # Set up webhook for the Flask app
+    PORT = int(os.environ.get('PORT', 8080))
+    updater.start_webhook(listen="0.0.0.0",
+                          port=PORT,
+                          url_path=TOKEN,
+                          webhook_url=f"https://{APP_NAME}.koyeb.app/{TOKEN}")
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 8080)))
+    main()

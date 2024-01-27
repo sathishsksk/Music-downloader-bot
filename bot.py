@@ -1,16 +1,10 @@
 from flask import Flask, request
-import requests
-import subprocess
 import os
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from helpers.media_info import *
 from messages.creator import *
 from telegram.ext.dispatcher import run_async
-from flask import Flask, request
-import os
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 app = Flask(__name__)
 

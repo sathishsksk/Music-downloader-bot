@@ -9,8 +9,7 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, Callb
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 dest = "telegramMusic/"
-TOKEN = os.getenv("BOT_TOKEN")
-APP_NAME = os.getenv("APP_NAME")
+TOKEN = '5862929153:AAGLEMTNGuOslFHfwzl1ncsCvhHTvRhcYCs'
 
 app = Flask(__name__)
 
@@ -97,47 +96,6 @@ def main():
     dp.add_error_handler(error_handler)
 
     logger.info("Loaded all handlers")
-
-    updater.start_polling()
-    updater.idle()
-
-if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 8080)))
-
-
-
-
-
-
-
-    else:
-        wrong_link(update)
-
-def download_media(song_id, quality='128kbps', output_format='mp3'):
-    # Function to download media using FFmpeg with specified quality
-    pass
-
-def set_quality(update, context):
-    # Command to set quality for downloading songs
-    quality = context.args[0].lower()
-    if quality in ['128kbps', '320kbps']:
-        # Store the chosen quality in user_data
-        context.user_data['quality'] = quality
-        update.message.reply_text(f'Quality set to {quality}.')
-    else:
-        update.message.reply_text('Invalid quality option. Please choose either 128kbps or 320kbps.')
-
-def main():
-    updater = Updater(TOKEN, use_context=True)
-    dp = updater.dispatcher
-
-    dp.add_handler(CommandHandler("start", start))
-    dp.add_handler(CommandHandler("help", help))
-    dp.add_handler(CommandHandler("list", list))
-    dp.add_handler(CommandHandler("contact", contact))
-    dp.add_handler(CommandHandler("setquality", set_quality, pass_args=True))
-    dp.add_handler(MessageHandler(Filters.text, download, run_async=True))
-    dp.add_error_handler(error_handler)
 
     updater.start_polling()
     updater.idle()

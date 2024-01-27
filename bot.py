@@ -7,18 +7,28 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from helpers.media_info import *
 from messages.creator import *
 from telegram.ext.dispatcher import run_async
-
-dest = "telegramMusic/"
-TOKEN = 'YOUR_TELEGRAM_BOT_TOKEN'
+from flask import Flask, request
+import os
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 app = Flask(__name__)
 
 def health_check():
-    return 'Bot is running and healthy!'
+    # Perform any necessary health checks here
+    # For example, check if the required environment variables are set
+    if 'TOKEN' in os.environ:
+        return 200
+    else:
+        return 500
 
 @app.route('/health', methods=['GET'])
 def health():
-    return health_check()
+    status_code = health_check()
+    return '', status_code
+
+dest = "telegramMusic/"
+TOKEN = '5595298904:AAExEMcbyKGA3cBdIECmFB-AD55Zx8L0uOM'
 
 def start(update, context):
     fname = update.message.chat.first_name
@@ -98,10 +108,8 @@ def main():
     dp.add_handler(MessageHandler(Filters.text, download, run_async=True))
     dp.add_error_handler(error_handler)
 
-    logger.info("Loaded all handlers")
-
     updater.start_polling()
     updater.idle()
 
 if __name__ == "__main__":
-    main()
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 8080)))

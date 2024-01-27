@@ -1,4 +1,3 @@
-from flask import Flask, request
 from addons.utils import logger
 from helpers.media_info import *
 import os
@@ -7,12 +6,12 @@ from messages.creator import *
 from telegram.ext.dispatcher import run_async
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+import http.server
+import socketserver
 
 dest = "telegramMusic/"
 TOKEN = os.getenv("BOT_TOKEN")
 APP_NAME = os.getenv("APP_NAME")
-
-app = Flask(__name__)
 
 def health_check():
     # Perform any necessary health checks here
@@ -22,10 +21,10 @@ def health_check():
     else:
         return 500
 
-@app.route('/health', methods=['GET'])
-def health():
-    status_code = health_check()
-    return '', status_code
+class HealthHandler(http.server.BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(health_check())
+        self.end_headers()
 
 def start(update, context):
     fname = update.message.chat.first_name
@@ -35,7 +34,7 @@ def help(update, context):
     update.message.reply_text(help_msg(), parse_mode="MarkdownV2")
 
 def list(update, context):
-    files = os.listdir(dest)
+    files = os.listdir("/app/telegramMusic")
     string = ""
     for l in files:
         if l.endswith(".mp3"):
@@ -76,14 +75,6 @@ def download(update, context: CallbackContext):
     else:
         wrong_link(update)
 
-def set_quality(update, context):
-    quality = context.args[0].lower()
-    if quality in ['128kbps', '320kbps']:
-        context.user_data['quality'] = quality
-        update.message.reply_text(f'Quality set to {quality}.')
-    else:
-        update.message.reply_text('Invalid quality option. Please choose either 128kbps or 320kbps.')
-
 def main():
     updater = Updater(TOKEN, use_context=True)
     dp = updater.dispatcher
@@ -92,18 +83,21 @@ def main():
     dp.add_handler(CommandHandler("help", help))
     dp.add_handler(CommandHandler("list", list))
     dp.add_handler(CommandHandler("contact", contact))
-    dp.add_handler(CommandHandler("setquality", set_quality, pass_args=True))
     dp.add_handler(MessageHandler(Filters.text, download, run_async=True))
     dp.add_error_handler(error_handler)
 
     logger.info("Loaded all handlers")
 
-    # Set up webhook for the Flask app
+    # Set up webhook for the Telegram bot
     PORT = int(os.environ.get('PORT', 8080))
     updater.start_webhook(listen="0.0.0.0",
                           port=PORT,
                           url_path=TOKEN,
                           webhook_url=f"https://{APP_NAME}.koyeb.app/{TOKEN}")
+
+    # Set up health check server
+    health_server = socketserver.TCPServer(("0.0.0.0", PORT + 1), HealthHandler)
+    health_server.serve_forever()
 
 if __name__ == "__main__":
     main()
